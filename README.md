@@ -1,7 +1,6 @@
 # DataMineLab5
 
-Data Mining Lab 5
-Data Mined Flight Data Word Cloud
+Data Mining Lab 5: Data Mined Flight Data Word Cloud
 
 Please use:
 
