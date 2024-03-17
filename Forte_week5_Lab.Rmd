@@ -1,0 +1,96 @@
+---
+title: "Week 5: Lab - Word Cloud Chapter Challenge"
+author: "Jonathan Forte"
+date: "2/9/2023"
+output: html_document
+---
+
+---
+
+# Instructions
+Create a word cloud using the `text` column from a real twitter dataset 
+(sample.csv).
+
+---
+
+```{r setup, message = FALSE}
+# Add your library below. Add wordcould2 in the library for fun and try out with wordcloud2 when producing wordclouds below.
+# install.packages("wordcloud2")
+library(wordcloud)
+library(wordcloud2)
+library(tm)
+```
+
+# Step 1. Load and Clean the Data
+Load in the `sample.csv` dataset from this project's data folder. Investigate the data structure, and read in "relevant" data for a text analysis. 
+Please make sure you transform the document to lowercase, delete stopwords & numbers & punctuation (1 point).
+
+```{r, "Step 1"}
+# Write your code below. 
+sampleData <- read.csv("data/sample.csv", stringsAsFactors = F)
+sampleData <- sampleData$text
+sampleCorpus <- Corpus(VectorSource(sampleData))
+sampleCorpus <- tm_map(sampleCorpus, content_transformer(tolower))
+sampleCorpus <- tm_map(sampleCorpus, removePunctuation)
+sampleCorpus <- tm_map(sampleCorpus, removeNumbers)
+sampleCorpus <- tm_map(sampleCorpus, removeWords, stopwords("english"))
+str(sampleCorpus)
+```
+
+---
+
+# Step 2. Adjust the Stopwords
+Add "can" and "just" to the stopwords list, then select/add two more stopwords of your choice. Write your rationale for choosing these two stopwords. You may need to this step after looking at the first word cloud results (1 point). 
+
+```{r, "Step 2"}
+# Write your code below.
+sampleCorpus <- tm_map(sampleCorpus, removeWords, c("can", "just", "get", "sfo"))
+
+# I chose "get" and "sfo" as my words for separate reasons. "Get" was unnecessary because it didn't provide any useful insight into the text. "sfo" was chosen because I do not know what it represents (it's probably an airport like LAX) and therefore does not help me understand the text better.
+
+tdmSample <- TermDocumentMatrix(sampleCorpus)
+sampleMatrix <- as.matrix(tdmSample)
+wordCount <- rowSums(sampleMatrix)
+wordCount <- sort(wordCount, decreasing = T)
+cloudFrame <- data.frame(word = names(wordCount), freq = wordCount)
+wordcloud2(cloudFrame, size = 3)
+```
+
+---
+
+# Step 3. Adjust the Theme
+Use five colors and "Dark2" for color theme. If you use the data as is, it will only show three colors. Use available attributes and data manipulation to show all five colors instead of three. Produce a similar graph using wordcloud2 (1 point).
+
+```{r, "Step 3"}
+# Write your code below.
+wordcloud(cloudFrame$word, cloudFrame$freq, colors = brewer.pal(5, "Dark2"), ordered.colors = F)
+wordcloud2(cloudFrame, size = 3, backgroundColor="black")
+```
+
+---
+
+# Step 4. Analysis
+Does the word cloud convey the key points of the document? (1 point). Critical thinking is important. Investigate the raw data (word distribution, sentiment analysis results), does the current word cloud really convey the key points of the raw data? If not, how would you improve the process to produce better results so that the results could be more meaningful to the company? Did you try everything to improve the meanings of the word cloud?
+
+
+> Yes, the word cloud makes it clear that the text revlolves around airplane/airport topic. The wordcloud2 wordcloud definitely is more aesthetically pleasing and, therefore, more useful for our purposes. Maybe by making the lower frequency words a little bigger, more information could be understood. 
+
+---
+
+# Step 5. Compile
+Submit the compiled file. 
+The wordcloud may prevent you from compiling. If so, do the following: 
+
+```
+jpeg('p1.jpg')  
+wordcloud(cloudFrame.t$word, cloudFrame.t$freq)  
+dev.off()
+```
+This will make the graphs save in the current working directory. 
+
+```{r, "Step 5"}
+# Write your code below, if necessary.
+jpeg('p1.jpg')  
+wordcloud(cloudFrame$word, cloudFrame$freq)  
+dev.off()
+```
